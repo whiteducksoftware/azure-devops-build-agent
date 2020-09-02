@@ -1,11 +1,11 @@
-<mxfile modified="2020-09-02T10:21:06.864Z" host="app.diagrams.net" agent="5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36" etag="FMEKBBewZCkRF6pRy0AO" version="13.6.6" type="github">
+<mxfile modified="2020-09-02T10:23:43.082Z" host="app.diagrams.net" agent="5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36" etag="V7Er0yKyqgHE6RIfOcco" version="13.6.6" type="github">
   <diagram id="Ht1M8jgEwFfnCIfOTk4-" name="Page-1">
     <mxGraphModel dx="983" dy="508" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="-QjtrjUzRDEMRZ5MF8oH-47" value="Build Agent Pro V2" style="text;html=1;resizable=0;points=[];autosize=1;align=left;verticalAlign=top;spacingTop=-4;fontSize=30;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="56.5" y="50" width="290" height="40" as="geometry" />
+        <mxCell id="-QjtrjUzRDEMRZ5MF8oH-47" value="Build Agent PRO for Azure DevOps" style="text;html=1;resizable=0;points=[];autosize=1;align=left;verticalAlign=top;spacingTop=-4;fontSize=30;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="56.5" y="50" width="520" height="40" as="geometry" />
         </mxCell>
         <mxCell id="SCVMTBWpLvtzJIhz15lM-1" value="" style="line;strokeWidth=2;html=1;fontSize=14;" parent="1" vertex="1">
           <mxGeometry x="55" y="104.5" width="1060" height="10" as="geometry" />
@@ -17,7 +17,7 @@
           <mxGeometry x="55" y="140" width="320" height="90" as="geometry" />
         </mxCell>
         <mxCell id="6OLwDovOC53qYYyb9LZN-7" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Azure_DevOps.svg;" parent="1" vertex="1">
-          <mxGeometry x="340" y="53.62" width="32.75" height="32.75" as="geometry" />
+          <mxGeometry x="570" y="53.629999999999995" width="32.75" height="32.75" as="geometry" />
         </mxCell>
         <mxCell id="6OLwDovOC53qYYyb9LZN-11" value="" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
           <mxGeometry x="570" y="130" width="20" height="130" as="geometry" />
