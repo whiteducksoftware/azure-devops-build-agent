@@ -1,6 +1,6 @@
-<mxfile modified="2020-09-03T10:00:57.997Z" host="app.diagrams.net" agent="5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36" etag="Zny6RMTusgUdGKxTKYeq" version="13.6.6" type="github">
+<mxfile modified="2020-09-03T11:20:37.847Z" host="app.diagrams.net" agent="5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36" etag="UYiFDklTPagkvIsuQiKW" version="13.6.6" type="github">
   <diagram id="Ht1M8jgEwFfnCIfOTk4-" name="Page-1">
-    <mxGraphModel dx="1426" dy="741" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="815" dy="423" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -13,8 +13,8 @@
         <mxCell id="6OLwDovOC53qYYyb9LZN-1" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px&quot;&gt;Components&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;" parent="1" vertex="1">
           <mxGeometry x="56.5" y="130" width="110" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="6OLwDovOC53qYYyb9LZN-3" value="&lt;ul&gt;&lt;li&gt;Linux Virtual Machine Scale Set&lt;/li&gt;&lt;li&gt;Autoscaler based on Azure DevOps requirements&lt;/li&gt;&lt;li&gt;Docker&lt;/li&gt;&lt;li&gt;Containerized Build Pipelines&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;" parent="1" vertex="1">
-          <mxGeometry x="55" y="140" width="320" height="90" as="geometry" />
+        <mxCell id="6OLwDovOC53qYYyb9LZN-3" value="&lt;ul&gt;&lt;li&gt;Linux Virtual Machine Scale Set&lt;/li&gt;&lt;li&gt;Autoscaler based on Azure DevOps&lt;/li&gt;&lt;li&gt;Docker&lt;/li&gt;&lt;li&gt;Containerized Build Pipelines&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="140" width="250" height="90" as="geometry" />
         </mxCell>
         <mxCell id="6OLwDovOC53qYYyb9LZN-7" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Azure_DevOps.svg;" parent="1" vertex="1">
           <mxGeometry x="570" y="53.629999999999995" width="32.75" height="32.75" as="geometry" />
@@ -34,9 +34,6 @@
             <mxPoint x="710" y="190" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="6OLwDovOC53qYYyb9LZN-20" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Azure_Pipelines .svg;" parent="1" vertex="1">
-          <mxGeometry x="720" y="160" width="60" height="60" as="geometry" />
-        </mxCell>
         <mxCell id="6OLwDovOC53qYYyb9LZN-21" value="&lt;span style=&quot;font-size: 7px&quot;&gt;Linux VM Scale Set&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="511.25" y="225" width="67.5" height="20" as="geometry" />
         </mxCell>
@@ -52,8 +49,11 @@
         <mxCell id="DmPy1XDaYtuW-2fn4pK0-1" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px&quot;&gt;Useful Links / Information&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;" parent="1" vertex="1">
           <mxGeometry x="58" y="235.5" width="200" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="DmPy1XDaYtuW-2fn4pK0-2" value="&lt;ul&gt;&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents?view=azure-devops#create-a-scale-set-with-custom-image-software-or-disk-size&quot;&gt;https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents?view=azure-devops#create-a-scale-set-with-custom-image-software-or-disk-size&lt;/a&gt;&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;" parent="1" vertex="1">
-          <mxGeometry x="58" y="255.5" width="920" height="40" as="geometry" />
+        <mxCell id="DmPy1XDaYtuW-2fn4pK0-2" value="&lt;ul&gt;&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents?view=azure-devops#create-a-scale-set-with-custom-image-software-or-disk-size&quot;&gt;https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents?view=azure-devops#create-a-scale-set-with-custom-image-software-or-disk-size&lt;/a&gt;&lt;br&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/azure/templates/microsoft.compute/virtualmachinescalesets&quot;&gt;https://docs.microsoft.com/en-us/azure/templates/microsoft.compute/virtualmachinescalesets&lt;/a&gt;&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;" parent="1" vertex="1">
+          <mxGeometry x="58" y="245.5" width="920" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="yvjiYJEWqWmrDW1QPKK0-2" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Azure_Pipelines	.svg;" vertex="1" parent="1">
+          <mxGeometry x="720" y="160" width="60" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
