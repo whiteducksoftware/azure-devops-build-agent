@@ -10,7 +10,7 @@ jobs:
        dockerVersion: 17.09.0-ce
        releaseType: stable
 - job: runInContainer
-  container: ubuntu:latest
+  #container: ubuntu:latest
   dependsOn: dockerInstall
   steps:
     - bash: for i in {1..120}; do echo "count:"" $i" && sleep 1s; done
