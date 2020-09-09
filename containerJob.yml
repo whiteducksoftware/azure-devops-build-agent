@@ -22,7 +22,7 @@ jobs:
     container: debian:latest
     dependsOn: dockerInstall
     steps:
-      - bash: cat /etc/os-releaseType
+      - bash: cat /etc/os-release
         displayName: print os 
       - bash: for i in {1..120}; do echo "count:"" $i" && sleep 1s; done
         displayName: wait 2 min.
