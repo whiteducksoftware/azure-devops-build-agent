@@ -19,8 +19,10 @@ jobs:
           targetType: 'inline'
           script: 'env | sort'
   - job: runInContainer
-    container: ubuntu:latest
+    container: debian:latest
     dependsOn: dockerInstall
     steps:
+      - bash: cat /etc/os-releaseType
+        displayName: print os 
       - bash: for i in {1..120}; do echo "count:"" $i" && sleep 1s; done
         displayName: wait 2 min.
