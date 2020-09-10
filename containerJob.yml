@@ -1,4 +1,4 @@
-pool: "dbr-vmss-test"
+pool: "dbr-vmss-test-pool"
 #trigger:
 #  - dbr-containerjob-test
 jobs:
