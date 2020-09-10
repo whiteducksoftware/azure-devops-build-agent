@@ -20,7 +20,7 @@ jobs:
           script: 'env | sort'
   - job: runInContainer
     container: debian:latest
-    dependsOn: dockerInstall
+#    dependsOn: prepSteps
     steps:
       - bash: cat /etc/os-release
         displayName: print os 
