@@ -11,15 +11,42 @@
         },
         "vmssName": {
             "type": "string",
-            "defaultValue": "linux-vmss",
+            "defaultValue": "ubuntu-vmss",
             "metadata": {
                 "description": "String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended."
             }
+        },
+        "instanceSize": {
+            "type": "string",
+            "defaultValue": "Standard_B1ls",
+            "metadata": {
+                "description": "Size of the VM"
+            }
+        },
+        "osDiskType": {
+            "type": "String",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "StandardSSD_LRS",
+                "UltraSSD_LRS"
+            ]
         },
         "adminUsername": {
             "type": "string",
             "metadata": {
                 "description": "Admin username on all VMs."
+            }
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "password",
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
             }
         },
         "adminPasswordOrKey": {
@@ -74,29 +101,33 @@
     },
     "functions": [],
     "variables": {
+        "singlePlacementGroup": "true",
         "addressPrefix": "10.0.0.0/16",
         "subnetPrefix": "10.0.0.0/24",
+        "securityGroupName": "[concat(parameters('vmssName'), 'nsgrg')]",
         "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
-        "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
-        "natPoolName": "[concat(parameters('vmssName'), 'natpool')]",
-        "bePoolName": "[concat(parameters('vmssName'), 'bepool')]",
         "nicName": "[concat(parameters('vmssName'), 'nic')]",
         "subnetName": "[concat(parameters('vmssName'), 'subnet')]",
-        "loadBalancerName": "[concat(parameters('vmssName'), 'lb')]",
         "virtualNetworkName": "[concat(parameters('vmssName'), 'vnet')]",
         "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
-        "natStartPort": 50000,
-        "natEndPort": 50120,
-        "natBackendPort": 22,
-        "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName'))]",
-        "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
         "osType": {
             "publisher": "Canonical",
             "offer": "UbuntuServer",
             "sku": "16.04-LTS",
             "version": "latest"
         },
-        "imageReference": "[variables('osType')]"
+        "imageReference": "[variables('osType')]",
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPasswordOrKey')]"
+                    }
+                ]
+            }
+        }
     },
     "resources": [
         {
@@ -138,52 +169,24 @@
             }
         },
         {
-            "type": "Microsoft.Network/loadBalancers",
-            "name": "[variables('loadBalancerName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('securityGroupName')]",
             "location": "[parameters('location')]",
-            "apiVersion": "2020-05-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
-            ],
             "properties": {
-                "frontendIPConfigurations": [
+                "securityRules": [
                     {
-                        "name": "LoadBalancerFrontEnd",
+                        "name": "rule1",
                         "properties": {
-                            "publicIPAddress": {
-                                "id": "[variables('publicIPAddressID')]"
-                            }
-                        }
-                    }
-                ],
-                "backendAddressPools": [
-                    {
-                        "name": "[variables('bePoolName')]"
-                    }
-                ],
-                "inboundNatPools": [
-                    {
-                        "name": "[variables('natPoolName')]",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[variables('frontEndIPConfigID')]"
-                            },
+                            "description": "This is the first rule",
                             "protocol": "Tcp",
-                            "frontendPortRangeStart": "[variables('natStartPort')]",
-                            "frontendPortRangeEnd": "[variables('natEndPort')]",
-                            "backendPort": "[variables('natBackendPort')]"
-                        }
-                    },
-                    {
-                        "name": "natpool2",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[variables('frontEndIPConfigID')]"
-                            },
-                            "protocol": "Tcp",
-                            "frontendPortRangeStart": 9000,
-                            "frontendPortRangeEnd": 9120,
-                            "backendPort": 9000
+                            "sourcePortRange": "23-45",
+                            "destinationPortRange": "46-56",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 123,
+                            "direction": "Inbound"
                         }
                     }
                 ]
@@ -191,35 +194,39 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "name": "vmsstest",
+            "name": "[parameters('vmssName')]",
             "location": "[parameters('location')]",
             "apiVersion": "2019-12-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
             ],
             "sku": {
-                "name": "Standard_B1ls",
+                "name": "[parameters('instanceSize')]",
                 "tier": "Standard",
-                "capacity": 2
+                "capacity": 0
             },
             "properties": {
                 "overprovision": "false",
                 "upgradePolicy": {
                     "mode": "Manual"
                 },
+                "singlePlacementGroup": "[variables('singlePlacementGroup')]",
                 "virtualMachineProfile": {
                     "storageProfile": {
                         "osDisk": {
                             "createOption": "FromImage",
-                            "caching": "ReadWrite"
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "[parameters('osDiskType')]"
+                            }
                         },
                         "imageReference": "[variables('imageReference')]"
                     },
                     "osProfile": {
                         "computerNamePrefix": "[parameters('vmssName')]",
                         "adminUsername": "[parameters('adminUsername')]",
-                        "adminPassword": "[parameters('adminPasswordOrKey')]"
+                        "adminPassword": "[parameters('adminPasswordOrKey')]",
+                        "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
                     },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
@@ -233,20 +240,7 @@
                                             "properties": {
                                                 "subnet": {
                                                     "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
-                                                },
-                                                "loadBalancerBackendAddressPools": [
-                                                    {
-                                                        "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
-                                                    }
-                                                ],
-                                                "loadBalancerInboundNatPools": [
-                                                    {
-                                                        "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
-                                                    },
-                                                    {
-                                                        "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/natpool2')]"
-                                                    }
-                                                ]
+                                                }
                                             }
                                         }
                                     ]
