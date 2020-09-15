@@ -170,19 +170,13 @@
 			}
 		],
         "outputs": {
-            "location": "[basics('location')]",
             "vmssName": "[basics('vmssName')]",
-            "osType": "[basics('osType')]",
-            "instanceSize": "[basics('instanceSize')]",
-            "osDiskType": "[basics('osDiskType')]",
+            "osType": "[steps('osVersion')]",
+            "instanceSize": "[steps('vmSize')]",
+            "osDiskType": "[steps('osDiskType')]",
             "adminUsername": "[basics('adminUsername')]",
             "authenticationType": "[basics('authenticationType')]",
-            "adminPasswordOrKey": "[basics('adminPasswordOrKey')]",
-            "publicIpNewOrExisting": "[basics('publicIpNewOrExisting')]",
-            "virtualNetworkNewOrExisting": "[basics('virtualNetworkNewOrExisting')]",
-            "publicIpDns": "[basics('publicIpDns')]",
-            "publicIpSku": "[basics('publicIpSku')]",
-            "publicIpAllocationMethod": "[basics('publicIpAllocationMethod')]"
+            "adminPasswordOrKey": "[basics('adminPasswordOrKey')]"
         }
     }
 }
