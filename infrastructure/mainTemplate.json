@@ -20,7 +20,7 @@
         },
         "instanceSize": {
             "type": "string",
-            "defaultValue": "Standard_B1ls",
+            "defaultValue": "Standard_B2s",
             "metadata": {
                 "description": "Size of the VM"
             }
