@@ -102,7 +102,12 @@
             "name": "pid-37aacd0b-65ab-517c-a6a3-e7dd0f6daad8",
             "type": "Microsoft.Resources/deployments",
             "properties": {
-                "mode": "Incremental"
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
             }
         },
         {
