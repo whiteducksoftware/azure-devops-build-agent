@@ -1,0 +1,220 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of the deployed resources."
+            }
+        },
+        "vmssName": {
+            "type": "string",
+            "defaultValue": "new-vmss",
+            "minLength": 1,
+            "maxLength": 9,
+            "metadata": {
+                "description": "String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended."
+            }
+        },
+        "osType": {
+            "type": "string",
+            "defaultValue": "18.04-LTS",
+            "metadata": {
+                "description": "Base OS for VMs"
+            }
+        },
+        "instanceSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+            "metadata": {
+                "description": "Size of the VM"
+            }
+        },
+        "osDiskType": {
+            "type": "String",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Type of disk to use"
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Admin username on all VMs."
+            }
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "password",
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "adminPasswordOrKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "resourcesPrefix": "[uniqueString(resourceGroup().id)]",
+        "vmssResourceName": "[concat(variables('resourcesPrefix'), '-', parameters('vmssName'))]",
+        "singlePlacementGroup": "true",
+        "addressPrefix": "10.0.0.0/16",
+        "subnetPrefix": "10.0.0.0/24",
+        "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
+        "publicIpSku": "Basic",
+        "publicIpDns": "[concat(toLower(parameters('vmssName')),'-', uniqueString(resourceGroup().id))]",
+        "publicIpAllocationMethod": "Dynamic",
+        "nicName": "[concat(parameters('vmssName'), 'nic')]",
+        "subnetName": "[concat(parameters('vmssName'), 'subnet')]",
+        "virtualNetworkName": "[concat(parameters('vmssName'), 'vnet')]",
+        "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
+        "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "[parameters('osType')]",
+            "version": "latest"
+        },
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPasswordOrKey')]"
+                    }
+                ]
+            }
+        },
+        "customDataEncoded": "I2Nsb3VkLWNvbmZpZwoKcGFja2FnZXM6CiAgLSBhcHQtdHJhbnNwb3J0LWh0dHBzCiAgLSBjYS1jZXJ0aWZpY2F0ZXMKICAtIGN1cmwKICAtIGdudXBnLWFnZW50CiAgLSBzb2Z0d2FyZS1wcm9wZXJ0aWVzLWNvbW1vbgoKIyBFbmFibGUgaXB2NCBmb3J3YXJkaW5nLCByZXF1aXJlZCBvbiBDSVMgaGFyZGVuZWQgbWFjaGluZXMKI3dyaXRlX2ZpbGVzOgojICAtIHBhdGg6IC9ldGMvc3lzY3RsLmQvOTktZW5hYmxlLWlwdjQtZm9yd2FyZGluZy5jb25mCiMgICAgY29udGVudDogfAojICAgICBuZXQuaXB2NC5jb25mLmFsbC5mb3J3YXJkaW5nPTEKIyBjcmVhdGUgdGhlIGRvY2tlciBncm91cApncm91cHM6CiAgLSBkb2NrZXIKCiMgQWRkIGRlZmF1bHQgYXV0byBjcmVhdGVkIHVzZXIgdG8gZG9ja2VyIGdyb3VwCiNzeXN0ZW1faW5mbzoKIyAgZGVmYXVsdF91c2VyOgojICAgIGdyb3VwczogW2RvY2tlcl0KCiMgSW5zdGFsbCBEb2NrZXIsIGZvciBwcm9kdWN0aW9uLCBjb25zaWRlciBwaW5uaW5nIHRvIHN0YWJsZSB2ZXJzaW9ucwpydW5jbWQ6CiAgLSBjdXJsIC1mc1NMIGh0dHBzOi8vZG93bmxvYWQuZG9ja2VyLmNvbS9saW51eC91YnVudHUvZ3BnIHwgYXB0LWtleSBhZGQgLQogIC0gYWRkLWFwdC1yZXBvc2l0b3J5ICJkZWIgW2FyY2g9YW1kNjRdIGh0dHBzOi8vZG93bmxvYWQuZG9ja2VyLmNvbS9saW51eC91YnVudHUgJChsc2JfcmVsZWFzZSAtY3MpIHN0YWJsZSIKICAtIGFwdC1nZXQgdXBkYXRlIC15CiAgLSBhcHQtZ2V0IGluc3RhbGwgLXkgZG9ja2VyLWNlIGRvY2tlci1jZS1jbGkgY29udGFpbmVyZC5pbwogIC0gc3lzdGVtY3RsIHN0YXJ0IGRvY2tlcgogIC0gc3lzdGVtY3RsIGVuYWJsZSBkb2NrZXI="
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-06-01",
+            "name": "pid-37aacd0b-65ab-517c-a6a3-e7dd0f6daad8",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-05-01",
+            "tags": {
+                "ownerVmssName": "[variables('vmssResourceName')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-05-01",
+            "sku": {
+                "name": "[variables('publicIpSku')]"
+            },
+            "tags": {
+                "ownerVmssName": "[variables('vmssResourceName')]"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIpAllocationMethod')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('publicIpDns')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "name": "[parameters('vmssName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2019-12-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+            ],
+            "sku": {
+                "name": "[parameters('instanceSize')]",
+                "tier": "Standard",
+                "capacity": 0
+            },
+            "tags": {
+                "ownerVmssName": "[variables('vmssResourceName')]"
+            },
+            "properties": {
+                "overprovision": "false",
+                "upgradePolicy": {
+                    "mode": "Manual"
+                },
+                "singlePlacementGroup": "[variables('singlePlacementGroup')]",
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "osDisk": {
+                            "createOption": "FromImage",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "[parameters('osDiskType')]"
+                            }
+                        },
+                        "imageReference": "[variables('imageReference')]"
+                    },
+                    "osProfile": {
+                        "computerNamePrefix": "[parameters('vmssName')]",
+                        "adminUsername": "[parameters('adminUsername')]",
+                        "adminPassword": "[parameters('adminPasswordOrKey')]",
+                        "customData": "[variables('customDataEncoded')]",
+                        "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[variables('nicName')]",
+                                "properties": {
+                                    "primary": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "[variables('ipConfigName')]",
+                                            "properties": {
+                                                "subnet": {
+                                                    "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
