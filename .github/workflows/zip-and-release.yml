@@ -10,7 +10,7 @@ jobs:
       - uses: papeloto/action-zip@v1
         with:
           files: infrastructure/
-          recursive: false
+          recursive: true
           dest: ubuntu.zip
       - uses: actions/upload-artifact@v1
         with:
