@@ -117,7 +117,7 @@
 								}
 							]
 						},
-						"visible": true
+						"visible": false
 					},
 					{
 						"name": "vmSize",
