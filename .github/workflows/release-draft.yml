@@ -13,11 +13,6 @@ jobs:
           files: infrastructure/
           recursive: true
           dest: ubuntu.zip
-      - uses: papeloto/action-zip@v1
-        with:
-          files: scripts/
-          recursive: false
-          dest: ubuntu.zip
       - uses: actions/upload-artifact@v1
         with:
           name: my-artifact
