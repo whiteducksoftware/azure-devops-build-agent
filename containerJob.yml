@@ -1,4 +1,4 @@
-pool: "dbr-vmss-test-pool2"
+pool: "dbr-vmss-test-pool"
 trigger: none
 jobs:
   - job: printHostOs
