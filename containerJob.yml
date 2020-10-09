@@ -4,6 +4,11 @@ jobs:
   - job: runInContainer
     container: debian:latest
     steps:
+      - task: Bash@3
+        displayName: print env variables
+        inputs:
+          targetType: 'inline'
+          script: 'env | sort'
       - bash: cat /etc/os-release
         displayName: print os 
       - bash: for i in {1..120}; do echo "count:"" $i" && sleep 1s; done
