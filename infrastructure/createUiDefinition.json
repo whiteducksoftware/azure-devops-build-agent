@@ -19,7 +19,7 @@
 						"toolTip": "String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended.",
 						"constraints": {
 							"required": true,
-							"regex": "^[a-z][a-zA-Z0-9_-]{1,14}[a-zA-Z0-9_-]$",
+							"regex": "^[a-z][a-zA-Z0-9_-]{1,7}[a-zA-Z0-9_-]$",
 							"validationMessage": "The value should have 9 or less characters. It must contain only letters and numbers."
 						},
 						"visible": true
@@ -76,11 +76,11 @@
 						"toolTip": "SSH Key or password for the Virtual Machine. SSH key is recommended.",
 						"constraints": {
 							"required": true,
-							"regex": "",
-							"validationMessage": ""
+							"regex": "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,}$",
+							"validationMessage": "Passwords must be at least 8 characters long, contain a letter, a number, and a special character"
 						},
 						"options": {
-							"hideConfirmation": true
+							"hideConfirmation": "[if(equals(coalesce(basics('vmCredentials').authenticationType, null), 'password'), false, true)]"
 						},
 						"visible": true
 					}
