@@ -7,4 +7,4 @@ By default all VM's inside the scale set are not provisoined with a public ip, t
 In case there is the need to connect to a VM you can use Vnet peering and Azure Bastion. 
 #### STEPS:
 - Create a Vnet inside a new resource group
-- 
+- WIP
