@@ -17,13 +17,6 @@
                 "description": "String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended."
             }
         },
-        "osType": {
-            "type": "string",
-            "defaultValue": "18.04-LTS",
-            "metadata": {
-                "description": "Base OS for VMs"
-            }
-        },
         "instanceSize": {
             "type": "string",
             "defaultValue": "Standard_B2s",
@@ -50,6 +43,20 @@
                 "description": "Password for the Virtual Machine."
             }
         },
+        "addressPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The IP range of the vnet in CIDR notation."
+            },
+            "defaultValue": "192.168.0.0/24"   
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The IP range of the default subnet in CIDR notation."
+            },
+            "defaultValue": "192.168.0.0/24"   
+        },
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
@@ -71,8 +78,6 @@
         "resourcesPrefix": "[uniqueString(resourceGroup().id)]",
         "vmssResourceName": "[concat(variables('resourcesPrefix'), '-', parameters('vmssName'))]",
         "singlePlacementGroup": "true",
-        "addressPrefix": "192.168.0.0/24",
-        "subnetPrefix": "192.168.0.0/24",
         "nicName": "[concat(parameters('vmssName'), 'nic')]",
         "subnetName": "[concat(parameters('vmssName'), 'subnet')]",
         "virtualNetworkName": "[concat(parameters('vmssName'), 'vnet')]",
@@ -80,7 +85,7 @@
         "imageReference": {
             "publisher": "Canonical",
             "offer": "UbuntuServer",
-            "sku": "[parameters('osType')]",
+            "sku": "18.04-LTS",
             "version": "latest"
         }
     },
@@ -109,14 +114,14 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('addressPrefix')]"
+                        "[parameters('addressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "[variables('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('subnetPrefix')]"
+                            "addressPrefix": "[parameters('subnetPrefix')]"
                         }
                     }
                 ]

@@ -78,27 +78,6 @@
 				"bladeTitle": "VM + Network settings",
 				"elements": [
 					{
-						"name": "osVersion",
-						"type": "Microsoft.Common.DropDown",
-						"label": "VM OS version",
-						"defaultValue": "Ubuntu 18.04 (Long Term Support)",
-						"toolTip": "Choose an OS version. We recommend to use the latest Long Term Support Version.",
-						"constraints": {
-							"required": true,
-							"allowedValues": [
-								{
-									"label": "Ubuntu 18.04 (Long Term Support)",
-									"value": "18.04-LTS"
-								},
-								{
-									"label": "Ubuntu 16.04 (Long Term Support)",
-									"value": "16.04-LTS"
-								}
-							]
-						},
-						"visible": false
-					},
-					{
 						"name": "vmSize",
 						"type": "Microsoft.Compute.SizeSelector",
 						"label": "VM Size",
@@ -184,13 +163,12 @@
 		"outputs": {
 			"location": "[location()]",
 			"vmssName": "[basics('resourcesConfig').vmssName]",
-			"osType": "[steps('vmSettings').osVersion]",
 			"instanceSize": "[steps('vmSettings').vmSize]",
 			"osDiskType": "[steps('vmSettings').osDiskType]",
 			"adminUsername": "[basics('vmCredentials').adminUsername]",
 			"adminPassword": "[basics('vmCredentials').adminPassword]",
-			"vnetIP": "[steps('vmSettings').vnetIP]",
-			"subnetIP": "[steps('vmSettings').subnetIP]"
+			"addressPrefix": "[steps('vmSettings').vnetIP]",
+			"subnetPrefix": "[steps('vmSettings').subnetIP]"
 		}
 	}
 }
