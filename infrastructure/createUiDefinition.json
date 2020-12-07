@@ -69,35 +69,14 @@
 		],
 		"steps": [
 			{
-				"name": "vmSizeSelector",
-				"label": "VM + OS Disk settings",
+				"name": "vmSettings",
+				"label": "VM + Network settings",
 				"subLabel": {
 					"preValidation": "Chose a VM Size. We strongly recommend to Premium SSD.",
 					"postValidation": "Done"
 				},
-				"bladeTitle": "VM + Disk settings",
+				"bladeTitle": "VM + Network settings",
 				"elements": [
-					{
-						"name": "osVersion",
-						"type": "Microsoft.Common.DropDown",
-						"label": "VM OS version",
-						"defaultValue": "Ubuntu 18.04 (Long Term Support)",
-						"toolTip": "Choose an OS version. We recommend to use the latest Long Term Support Version.",
-						"constraints": {
-							"required": true,
-							"allowedValues": [
-								{
-									"label": "Ubuntu 18.04 (Long Term Support)",
-									"value": "18.04-LTS"
-								},
-								{
-									"label": "Ubuntu 16.04 (Long Term Support)",
-									"value": "16.04-LTS"
-								}
-							]
-						},
-						"visible": false
-					},
 					{
 						"name": "vmSize",
 						"type": "Microsoft.Compute.SizeSelector",
@@ -143,6 +122,40 @@
 							"required": true
 						},
 						"visible": true
+					},
+					{
+						"name": "vnetIP",
+						"type": "Microsoft.Common.TextBox",
+						"label": "Virtual network IP address",
+						"defaultValue": "192.168.0.0/24",
+						"toolTip": "Network IP address range in CIDR notation",
+						"constraints": {
+        					"required": true,
+        					"validations": [
+            					{
+                					"regex": "^(?:[0-9]{1,3}.){3}[0-9]{1,3}\/[0-9]{2}$",
+                					"message": "not a valid IP address. E.g. 192.168.0.0/24"
+            					}
+        					]
+    					},
+						"visible": true
+					},
+					{
+						"name": "subnetIP",
+						"type": "Microsoft.Common.TextBox",
+						"label": "Subnet IP address",
+						"defaultValue": "192.168.0.0/24",
+						"toolTip": "Subnet IP address range in CIDR notation",
+						"constraints": {
+        					"required": true,
+        					"validations": [
+            					{
+                					"regex": "^(?:[0-9]{1,3}.){3}[0-9]{1,3}\/[0-9]{2}$",
+                					"message": "not a valid IP address. E.g. 192.168.0.0/24"
+            					}
+        					]
+    					},
+						"visible": true
 					}
 				]
 			}
@@ -150,11 +163,12 @@
 		"outputs": {
 			"location": "[location()]",
 			"vmssName": "[basics('resourcesConfig').vmssName]",
-			"osType": "[steps('vmSizeSelector').osVersion]",
-			"instanceSize": "[steps('vmSizeSelector').vmSize]",
-			"osDiskType": "[steps('vmSizeSelector').osDiskType]",
+			"instanceSize": "[steps('vmSettings').vmSize]",
+			"osDiskType": "[steps('vmSettings').osDiskType]",
 			"adminUsername": "[basics('vmCredentials').adminUsername]",
-			"adminPassword": "[basics('vmCredentials').adminPassword]"
+			"adminPassword": "[basics('vmCredentials').adminPassword]",
+			"addressPrefix": "[steps('vmSettings').vnetIP]",
+			"subnetPrefix": "[steps('vmSettings').subnetIP]"
 		}
 	}
 }
