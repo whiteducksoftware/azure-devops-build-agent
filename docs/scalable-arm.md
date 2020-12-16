@@ -34,9 +34,9 @@ stages:
 This is an example for a corresponding Dockerfile:
 
 ``` Dockerfile
-FROM arm64v8/ubuntu:20.04
+FROM --platform=linux/arm64 ubuntu:20.04
 
-RUN echo "hello!"
+RUN uname -m
 
 CMD ["/bin/bash"]
 ```
@@ -70,7 +70,7 @@ stages:
       displayName: echo
       inputs:
         targetType: 'inline'
-        script: /usr/bin/uname -a
+        script: /usr/bin/uname -m
 
 ```
 
