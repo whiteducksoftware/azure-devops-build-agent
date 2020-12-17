@@ -64,7 +64,7 @@ stages:
   - job: build
     displayName: build
     container:
-      image: arm64v8/ubuntu:20.04
+      image: ubuntu:20.04
       options: --platform linux/arm64/v8
       # endpoint: 'myServiceConnection'
     steps:
@@ -76,4 +76,4 @@ stages:
 
 ```
 
-More details on the Azure Devops Container job is available [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops).
+More details on the Azure DevOps Container job is available [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops).
