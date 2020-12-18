@@ -48,14 +48,14 @@
             "metadata": {
                 "description": "The IP range of the vnet in CIDR notation."
             },
-            "defaultValue": "192.168.0.0/24"   
+            "defaultValue": "192.168.0.0/24"
         },
         "subnetPrefix": {
             "type": "string",
             "metadata": {
                 "description": "The IP range of the default subnet in CIDR notation."
             },
-            "defaultValue": "192.168.0.0/24"   
+            "defaultValue": "192.168.0.0/24"
         },
         "_artifactsLocation": {
             "type": "string",
@@ -74,7 +74,8 @@
     },
     "functions": [],
     "variables": {
-        "customData": "[concat('#include\n', uri(parameters('_artifactsLocation'), concat('scripts/cloud-init.yml', parameters('_artifactsLocationSasToken'))))]",
+        "scriptFolder": "scripts/",
+        "scriptFileName": "init-script.sh",
         "resourcesPrefix": "[uniqueString(resourceGroup().id)]",
         "vmssResourceName": "[concat(variables('resourcesPrefix'), '-', parameters('vmssName'))]",
         "singlePlacementGroup": "true",
@@ -164,8 +165,8 @@
                     "osProfile": {
                         "computerNamePrefix": "[parameters('vmssName')]",
                         "adminUsername": "[parameters('adminUsername')]",
-                        "adminPassword": "[parameters('adminPassword')]",
-                        "customData": "[base64(variables('customData'))]"                    },
+                        "adminPassword": "[parameters('adminPassword')]"
+                    },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
                             {
@@ -182,6 +183,25 @@
                                             }
                                         }
                                     ]
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "AppInstall",
+                                "properties": {
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.0",
+                                    "autoUpgradeMinorVersion": true,
+                                    "settings": {
+                                        "fileUris": [
+                                            "[uri(parameters('_artifactsLocation'), concat(variables('scriptFolder'), variables('scriptFileName'), parameters('_artifactsLocationSasToken')))]"
+                                        ],
+                                        "commandToExecute": "[concat('sh ', variables('scriptFileName'))]"
+                                    }
                                 }
                             }
                         ]
