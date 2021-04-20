@@ -1,0 +1,36 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "admin_Username": {
+      "value": "jo"
+    },
+    "admin_Password": {
+      "value": "Hallo1234567!"
+    },
+    "windows_OS_Version": {
+      "value": "2016-Datacenter"
+    },
+    "vm_Size": {
+      "value": "Standard_B2s"
+    },
+    "vsts_server_url": {
+      "value": "whiteduck"
+    },
+    "agent_pool": {
+      "value": "PrivateAgents"
+    },
+    "agent_name": {
+      "value": "agent7"
+    },
+    "pat_token": {
+      "value": "asdfasdfasdfasdfasdfasdfasdfasdf"
+    },
+    "vm_Name": {
+      "value": "deployTest"
+    },
+    "location": {
+      "value": "westeurope"
+    }
+  }
+}

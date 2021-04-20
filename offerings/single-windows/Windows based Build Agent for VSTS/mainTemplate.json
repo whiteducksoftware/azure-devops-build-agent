@@ -1,0 +1,544 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "admin_Username": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Username for the Virtual Machine."
+      }
+    },
+    "admin_Password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the Virtual Machine."
+      }
+    },
+    "vm_Name": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Globally unique DNS Name for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+          "description": "Location of the deployed resources."
+      } 
+    },
+    "windows_OS_Version": {
+      "type": "string",
+      "defaultValue": "2019-Datacenter",
+      "allowedValues": [
+        "2019-Datacenter-Core-smalldisk",
+        "2019-Datacenter"
+      ],
+      "metadata": {
+        "description": "Choose an OS version. To save costs, chose Windows Server 2019 Core [Smalldisk]. Windows Server 2019 Core [smalldisk] is console only and has just 30GB disk size."
+      }
+    },
+    "vm_Size": {
+      "type": "string",
+      "defaultValue": "Standard_B2s",
+      "metadata": {
+        "description": "Defines the Size of the VM. We recommend 'Standard_B2s'"
+      }
+    },
+    "vsts_server_url": {
+      "type": "string",
+      "metadata": {
+        "description": "Your Azure DevOps/VSTS Team Url, e.g. https://dev.azure.com/YOURTEAM or https://YOURTEAM.visualstudio.com"
+      }
+    },
+    "agent_pool": {
+      "type": "string",
+      "defaultValue": "Default",
+      "metadata": {
+        "description": "Fill in the Agent Pool where your Agent shall serve."
+      }
+    },
+    "agent_name": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Fill in the Agent name."
+      }
+    },
+    "pat_token": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Enter the Personal Acces Token which would be used to authenticate against Visual Studio Teamservices account to download and configure agent. [How to generate a PAT](https://docs.microsoft.com/en-us/vsts/accounts/use-personal-access-tokens-to-authenticate)"
+      }
+    }
+  },
+  "variables": {
+    "vm_Name": "[parameters('vm_Name')]",
+    "vsts_url": "[parameters('vsts_server_url')]",
+    "imagePublisher": "MicrosoftWindowsServer",
+    "imageOffer": "WindowsServer",
+    "nicName": "[concat(variables('vm_Name') , 'Nic')]",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetName": "Subnet",
+    "subnetPrefix": "10.0.0.0/24",
+    "vhdStorageType": "Standard_LRS",
+    "publicIPAddressName": "[variables('vm_Name')]",
+    "publicIPAddressType": "Static",
+    "virtualNetworkName": "MyVNET",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
+    "vhdStorageAccountName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
+    "diagnosticsStorageAccountName": "[variables('vhdStorageAccountName')]",
+    "wadmetricsresourceid": "[resourceId('Microsoft.Compute/virtualMachines', variables('vm_Name'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('vhdStorageAccountName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "StorageAccount"
+      },
+      "sku": {
+        "name": "[variables('vhdStorageType')]"
+      },
+      "kind": "Storage"
+    },
+    {
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "PublicIPAddress"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
+      }
+    },
+    {
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "VirtualNetwork"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('nicName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "NetworkInterface"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('vm_Name')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "VSTS Server": "[variables('vsts_url')]",
+        "Agent Pool": "[parameters('agent_pool')]",
+        "Agent Name": "[parameters('agent_name')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/', variables('vhdStorageAccountName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vm_Size')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vm_Name')]",
+          "adminUsername": "[parameters('admin_Username')]",
+          "adminPassword": "[parameters('admin_Password')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[parameters('windows_OS_Version')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('vhdStorageAccountName')), '2018-02-01').primaryEndpoints.blob]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "type": "extensions",
+          "name": "Microsoft.Insights.VMDiagnosticsSettings",
+          "apiVersion": "2017-03-30",
+          "location": "[parameters('location')]",
+          "tags": {
+            "displayName": "AzureDiagnostics"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines/', variables('vm_Name'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Diagnostics",
+            "type": "IaaSDiagnostics",
+            "typeHandlerVersion": "1.9",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "WadCfg": {
+                "DiagnosticMonitorConfiguration": {
+                  "overallQuotaInMB": "4096",
+                  "DiagnosticInfrastructureLogs": {
+                    "scheduledTransferLogLevelFilter": "Error"
+                  },
+                  "WindowsEventLog": {
+                    "scheduledTransferPeriod": "PT1M",
+                    "DataSource": [
+                      {
+                        "name": "Application!*[System[(Level = 1) or (Level = 2)]]"
+                      },
+                      {
+                        "name": "Security!*[System[(Level = 1 or Level = 2)]]"
+                      },
+                      {
+                        "name": "System!*[System[(Level = 1 or Level = 2)]]"
+                      }
+                    ]
+                  },
+                  "PerformanceCounters": {
+                    "scheduledTransferPeriod": "PT1M",
+                    "PerformanceCounterConfiguration": [
+                      {
+                        "counterSpecifier": "\\Processor(_Total)\\% Processor Time",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "CPU utilization",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Processor(_Total)\\% Privileged Time",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "CPU privileged time",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Processor(_Total)\\% User Time",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "CPU user time",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Processor Information(_Total)\\Processor Frequency",
+                        "sampleRate": "PT15S",
+                        "unit": "Count",
+                        "annotation": [
+                          {
+                            "displayName": "CPU frequency",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\System\\Processes",
+                        "sampleRate": "PT15S",
+                        "unit": "Count",
+                        "annotation": [
+                          {
+                            "displayName": "Processes",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Process(_Total)\\Thread Count",
+                        "sampleRate": "PT15S",
+                        "unit": "Count",
+                        "annotation": [
+                          {
+                            "displayName": "Threads",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Process(_Total)\\Handle Count",
+                        "sampleRate": "PT15S",
+                        "unit": "Count",
+                        "annotation": [
+                          {
+                            "displayName": "Handles",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Memory\\% Committed Bytes In Use",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "Memory usage",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Memory\\Available Bytes",
+                        "sampleRate": "PT15S",
+                        "unit": "Bytes",
+                        "annotation": [
+                          {
+                            "displayName": "Memory available",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Memory\\Committed Bytes",
+                        "sampleRate": "PT15S",
+                        "unit": "Bytes",
+                        "annotation": [
+                          {
+                            "displayName": "Memory committed",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\Memory\\Commit Limit",
+                        "sampleRate": "PT15S",
+                        "unit": "Bytes",
+                        "annotation": [
+                          {
+                            "displayName": "Memory commit limit",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\% Disk Time",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "Disk active time",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\% Disk Read Time",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "Disk active read time",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\% Disk Write Time",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "Disk active write time",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\Disk Transfers/sec",
+                        "sampleRate": "PT15S",
+                        "unit": "CountPerSecond",
+                        "annotation": [
+                          {
+                            "displayName": "Disk operations",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\Disk Reads/sec",
+                        "sampleRate": "PT15S",
+                        "unit": "CountPerSecond",
+                        "annotation": [
+                          {
+                            "displayName": "Disk read operations",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\Disk Writes/sec",
+                        "sampleRate": "PT15S",
+                        "unit": "CountPerSecond",
+                        "annotation": [
+                          {
+                            "displayName": "Disk write operations",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\Disk Bytes/sec",
+                        "sampleRate": "PT15S",
+                        "unit": "BytesPerSecond",
+                        "annotation": [
+                          {
+                            "displayName": "Disk speed",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\Disk Read Bytes/sec",
+                        "sampleRate": "PT15S",
+                        "unit": "BytesPerSecond",
+                        "annotation": [
+                          {
+                            "displayName": "Disk read speed",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\PhysicalDisk(_Total)\\Disk Write Bytes/sec",
+                        "sampleRate": "PT15S",
+                        "unit": "BytesPerSecond",
+                        "annotation": [
+                          {
+                            "displayName": "Disk write speed",
+                            "locale": "en-us"
+                          }
+                        ]
+                      },
+                      {
+                        "counterSpecifier": "\\LogicalDisk(_Total)\\% Free Space",
+                        "sampleRate": "PT15S",
+                        "unit": "Percent",
+                        "annotation": [
+                          {
+                            "displayName": "Disk free space (percentage)",
+                            "locale": "en-us"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Metrics": {
+                    "resourceId": "[variables('wadmetricsresourceid')]",
+                    "MetricAggregation": [
+                      {
+                        "scheduledTransferPeriod": "PT1H"
+                      },
+                      {
+                        "scheduledTransferPeriod": "PT1M"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "protectedSettings": {
+              "storageAccountName": "[variables('diagnosticsStorageAccountName')]",
+              "storageAccountKey": "[listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName')), '2018-02-01').keys[0].value]"
+            }
+          }
+        },
+        {
+          "name": "customScript",
+          "type": "extensions",
+          "location": "[parameters('location')]",
+          "apiVersion": "2017-03-30",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('vm_Name'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.9",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "[uri(deployment().properties.templateLink.uri, 'configureVM.ps1')]"
+              ]
+            },
+            "protectedSettings": {
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File configureVM.ps1', ' -vsts_URL ' , '\"' , variables('vsts_url') , '\"' , ' -agent_Pool ' , '\"',  parameters('agent_pool') , '\"' , ' -agent_Name ' , '\"',  parameters('agent_name') , '\"' , ' -pat_Token ' , '\"' , parameters('pat_token') , '\"')]"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

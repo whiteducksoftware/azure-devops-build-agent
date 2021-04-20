@@ -1,0 +1,200 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "basics": [
+      {
+        "name": "vm_Name",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Virtual Machine name",
+        "toolTip": "Chose an unique name which identifys your virtual machine.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-z][a-zA-Z0-9_-]{1,12}[a-zA-Z0-9_-]$",
+          "validationMessage": "The value should not be empty, start with a lowercase character, must be less than 15 characters and must contain only letters and numbers."
+        },
+        "visible": true
+      },
+      {
+        "name": "vm_Credentials",
+        "type": "Microsoft.Common.Section",
+        "label": "Default VM credentials",
+        "elements": [
+          {
+            "name": "user_Name",
+            "type": "Microsoft.Compute.UserNameTextBox",
+            "label": "User name",
+            "defaultValue": "",
+            "toolTip": "This user name can be used to connect via Remote Desktop to your virtual machine.",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z0-9A-Z]{1,30}$",
+              "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+            },
+            "osPlatform": "Windows",
+            "visible": true
+          },
+          {
+            "name": "password",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": {
+              "password": "Password",
+              "confirmPassword": "Confirm password"
+            },
+            "toolTip": "Passwords must be at least 12 characters long, contain a letter, a number, and a special character",
+            "constraints": {
+              "required": true,
+              "regex": "^(?=(.*[A-Za-z]){1,})(?=(.*[\\d]){1,})(?=(.*[\\W]){1,})(?!.*\\s).{12,}$",
+              "validationMessage": "Passwords must be at least 12 characters long, contain a letter, a number, and a special character"
+            },
+            "options": {
+              "hideConfirmation": false
+            },
+            "visible": true
+          }
+        ],
+        "visible": true
+      },
+      {
+        "name": "windows_OS_Version",
+        "type": "Microsoft.Common.DropDown",
+        "label": "VM OS version",
+        "defaultValue": "2019-Datacenter",
+        "toolTip": "Choose an OS version. To save costs, chose Windows Server 2019 Core [Smalldisk]. Windows Server 2019 Core [smalldisk] is console only and has just 30GB disk size.",
+        "constraints": {
+          "allowedValues": [
+            {
+              "label": "Windows Server 2019 Datacenter",
+              "value": "2019-Datacenter"
+            },
+            {
+              "label": "Windows Server 2019 Core [Smalldisk]",
+              "value": "2019-Datacenter-Core-smalldisk"
+            }
+          ]
+        },
+        "visible": true
+      }
+    ],
+    "steps": [
+      {
+        "name": "vm_Size_Selector",
+        "label": "VM Size",
+        "subLabel": {
+          "preValidation": "Chose a VM Size. We strongly recommend to SSD.",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "VM Size",
+        "elements": [
+          {
+            "name": "vm_Size",
+            "type": "Microsoft.Compute.SizeSelector",
+            "label": "VM Size",
+            "toolTip": "Select a size for your VM",
+            "recommendedSizes": [
+              "Standard_B1ms",
+              "Standard_B2s"
+            ],
+            "constraints": {
+              "allowedSizes": [
+                "Standard_A2_v2",
+                "Standard_A4_v2",
+                "Standard_B1ms",
+                "Standard_B2s",
+                "Standard_D2s_v3",
+                "Standard_D4s_v3"
+              ]
+            },
+            "osPlatform": "Windows",
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "[basics('windows_OS_Version')]"
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "name": "vsts_Agent_Config",
+        "label": "Azure DevOps Agent settings",
+        "subLabel": {
+          "preValidation": "Configure your build agent",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Agent settings",
+        "elements": [
+          {
+            "name": "server_URL",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Team URL",
+            "toolTip": "Your Azure DevOps/VSTS Team Url, e.g. https://dev.azure.com/YOURTEAM or https://YOURTEAM.visualstudio.com",
+            "constraints": {
+              "required": true,
+              "regex": "^(https:\/\/dev\\.azure\\.com\/[a-zA-Z0-9]{1,256})|(https:\/\/[a-zA-Z0-9]{1,256}\\.visualstudio\\.com)$",
+              "validationMessage": "The value should be an valid Azure DevOps/VSTS Team Url."
+            },
+            "visible": true
+          },
+          {
+            "name": "agent_Pool_Name",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Agent Pool",
+            "defaultValue": "Default",
+            "toolTip": "Specify the agentpool where your agent will be registered.",
+            "constraints": {
+              "required": true,
+              "regex": "[a-zA-Z0-9 -]{0,127}$",
+              "validationMessage": "A valid pool name is less than 128 characters in length and contains only alphanumeric characters, spaces, and '-'. "
+            },
+            "visible": true
+          },
+          {
+            "name": "agent_Name",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Agent name",
+            "defaultValue": "[basics('vm_Name')]",
+            "toolTip": "Specify a name for your private build agent. Agent names should be unique within a agent pool",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-zA-Z0-9_-]{1,14}[a-zA-Z0-9_-]$",
+              "validationMessage": "The value should not be empty has less then 16 characters. The agent name must contain only letters and numbers."
+            },
+            "visible": true
+          },
+          {
+            "name": "pat_Token",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": {
+              "password": "Personal Acces Token",
+              "confirmPassword": "Confirm Personal Acces Token"
+            },
+            "toolTip": "Enter the Personal Acces Token which would be used to authenticate against Visual Studio Teamservices account to download and configure agent. [How to generate a PAT](https://docs.microsoft.com/en-us/vsts/accounts/use-personal-access-tokens-to-authenticate)",
+            "constraints": {
+              "required": true,
+              "regex": "[a-z0-9]{52}",
+              "validationMessage": "The value should not be empty."
+            },
+            "options": {
+              "hideConfirmation": false
+            },
+            "visible": true
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "location": "[location()]",
+      "admin_Username": "[basics('vm_Credentials').user_Name]",
+      "admin_Password": "[basics('vm_Credentials').password]",
+      "vm_name": "[basics('vm_Name')]",
+      "windows_OS_Version": "[basics('windows_OS_Version')]",
+      "vm_Size": "[steps('vm_Size_Selector').vm_Size]",
+      "vsts_server_url": "[steps('vsts_Agent_Config').server_URL]",
+      "agent_pool": "[steps('vsts_Agent_Config').agent_Pool_Name]",
+      "agent_name": "[steps('vsts_Agent_Config').agent_Name]",
+      "pat_token": "[steps('vsts_Agent_Config').pat_Token]"
+    }
+  }
+}
