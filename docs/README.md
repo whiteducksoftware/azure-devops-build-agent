@@ -7,3 +7,6 @@ Choose the docs based on your deployed version:
 
 Deployment guide
 * [Build Agent SCALABLE deployment](./scalable-deployment.md)
+
+Code examples
+* [Container job](./container-job.md)
