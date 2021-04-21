@@ -7,6 +7,8 @@ This repo contains the source as well as docs for our managed Build Agent for Az
 * Build Agent SCALABLE
 * Build Agent SINGLE WINDOWS VM (solution template)
 
+Check out the documentation [here](./docs/README.md).
+
 ## Build Agent SCALABLE
 
 Build Agent SCALABLE offers a generic, containerized and scalable CI/CD environemnt for Azure DevOps.
