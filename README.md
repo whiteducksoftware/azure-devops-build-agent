@@ -5,7 +5,7 @@ An Azure Marketplace offering for our managed Build Agent for Azure DevOps 🚀 
 This repo contains the source as well as docs for our managed Build Agent for Azure DevOps. We offer to different versions:
 
 * Build Agent SCALABLE
-* Build Agent CORE (future version)
+* Build Agent SINGLE WINDOWS VM (solution template)
 
 ## Build Agent SCALABLE
 
