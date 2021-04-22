@@ -9,7 +9,7 @@ jobs:
         uses: aliencube/arm-ttk-actions@v0.3
         id: armtest
         with:
-          path: offerings/scalable, offerings/single-windows
+          path: offerings/scalable
       - name: Test result - path
         shell: bash
         continue-on-error: true
