@@ -11,7 +11,7 @@ Check out the documentation [here](./docs/README.md).
 
 ## Build Agent SCALABLE
 
-Build Agent SCALABLE offers a generic, containerized and scalable CI/CD environemnt for Azure DevOps.
+Build Agent SCALABLE offers a generic, containerized and scalable CI/CD environment for Azure DevOps.
 
 Further details and docs are available [here](./docs/scalable.md).
 
