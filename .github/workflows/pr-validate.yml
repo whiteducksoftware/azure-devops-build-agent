@@ -15,12 +15,12 @@ jobs:
         id: armtest_single_win
         with:
           path: offerings/single-windows-vm
-      - name: Test result SCALABLE - path
+      - name: Test result SCALABLE
         shell: bash
         continue-on-error: true
         run: |
           echo "${{ toJSON(fromJSON(steps.armtest_scalable.outputs.results)) }}"
-      - name: Test result SINGLE WIN VM- path
+      - name: Test result SINGLE WIN VM
         shell: bash
         continue-on-error: true
         run: |
