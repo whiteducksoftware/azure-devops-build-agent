@@ -1,0 +1,17 @@
+name: validate-PR
+on: [pull_request, workflow_dispatch]
+jobs:
+  validate_bicep_and_dotnet_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run ARM TTK 
+        uses: aliencube/arm-ttk-actions@v0.3
+        id: armtest
+        with:
+          path: offerings
+      - name: Test result - path
+        shell: bash
+        continue-on-error: true
+        run: |
+          echo "${{ toJSON(fromJSON(steps.pathtest.outputs.results)) }}"
