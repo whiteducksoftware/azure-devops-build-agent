@@ -1,7 +1,7 @@
 name: validate-PR
 on: [pull_request, workflow_dispatch]
 jobs:
-  validate_bicep_and_dotnet_build:
+  run_ARM_TTK:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -9,7 +9,7 @@ jobs:
         uses: aliencube/arm-ttk-actions@v0.3
         id: armtest
         with:
-          path: offerings
+          path: offerings/scalable, offerings/single-windows
       - name: Test result - path
         shell: bash
         continue-on-error: true
