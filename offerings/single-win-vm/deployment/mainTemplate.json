@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+      },
+      "defaultValue": "[deployment().properties.templateLink.uri]"
+    },
     "admin_Username": {
       "type": "string",
       "minLength": 1,
@@ -26,8 +33,8 @@
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
-          "description": "Location of the deployed resources."
-      } 
+        "description": "Location of the deployed resources."
+      }
     },
     "windows_OS_Version": {
       "type": "string",
@@ -75,6 +82,7 @@
     }
   },
   "variables": {
+    "scriptFileUri": "[uri(parameters('_artifactsLocation'), 'configureVM.ps1']",
     "vm_Name": "[parameters('vm_Name')]",
     "vsts_url": "[parameters('vsts_server_url')]",
     "imagePublisher": "MicrosoftWindowsServer",
@@ -203,7 +211,6 @@
           },
           "osDisk": {
             "name": "osdisk",
-
             "caching": "ReadWrite",
             "createOption": "FromImage"
           }
@@ -531,7 +538,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "[uri(deployment().properties.templateLink.uri, 'configureVM.ps1')]"
+                "[variables('scriptFileUri')]"
               ]
             },
             "protectedSettings": {
