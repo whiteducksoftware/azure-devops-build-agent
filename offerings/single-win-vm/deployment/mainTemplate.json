@@ -9,6 +9,13 @@
       },
       "defaultValue": "[deployment().properties.templateLink.uri]"
     },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+      },
+      "defaultValue": ""
+    },
     "admin_Username": {
       "type": "string",
       "minLength": 1,
@@ -82,7 +89,7 @@
     }
   },
   "variables": {
-    "scriptFileUri": "[uri(parameters('_artifactsLocation'), 'configureVM.ps1')]",
+    "scriptFileUri": "[uri(parameters('_artifactsLocation'), concat('configureVM.ps1', parameters('_artifactsLocationSasToken')))]",
     "vm_Name": "[parameters('vm_Name')]",
     "vsts_url": "[parameters('vsts_server_url')]",
     "imagePublisher": "MicrosoftWindowsServer",
