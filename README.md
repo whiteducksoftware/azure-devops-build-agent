@@ -21,6 +21,8 @@ Further details and docs are available [here](./docs/scalable.md).
 
 Build Agent SINGLE WINDOWS VM is a simple solution template that will deploy a windows based build agent for your Azure DevOps pipelines. 
 
+**NOTE: the artifact uploaded by the pipeline can not be used "out of the box" for marketplace offers. The 'vsts-agent-win-x64-2.186.1.zip' has to be replaced manually with the .zip from the repo.**
+
 Check out the documentation [here](./docs/README.md).
 
 > add link to market place offer
